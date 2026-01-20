@@ -165,19 +165,56 @@
         .roulette-item.netherstar {
             background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
             border-color: #4cc9f0;
-            box-shadow: 0 0 20px rgba(76, 201, 240, 0.5);
+            box-shadow: 0 0 20px rgba(76, 201, 240, 0.5), 0 0 30px rgba(76, 201, 240, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roulette-item.netherstar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: glint 3s infinite linear;
         }
 
         .roulette-item.ender {
             background: linear-gradient(135deg, #7209b7 0%, #3a0ca3 100%);
             border-color: #9d4edd;
-            box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.5), 0 0 30px rgba(157, 78, 221, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roulette-item.ender::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: glint 3s infinite linear;
         }
 
         .roulette-item.masterball {
             background: linear-gradient(135deg, #ff595e 0%, #ff9f1c 100%);
             border-color: #ff9f1c;
             box-shadow: 0 0 20px rgba(255, 159, 28, 0.5);
+        }
+
+        .roulette-item.cherish {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        @keyframes glint {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         .roulette-item img {
@@ -203,7 +240,8 @@
 
         .roulette-item.netherstar .roulette-item-name,
         .roulette-item.ender .roulette-item-name,
-        .roulette-item.masterball .roulette-item-name {
+        .roulette-item.masterball .roulette-item-name,
+        .roulette-item.cherish .roulette-item-name {
             color: white;
             text-shadow: 0 0 5px rgba(157, 78, 221, 0.8);
         }
@@ -481,16 +519,47 @@
         .result-popup.netherstar {
             background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
             border-color: #4cc9f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-popup.netherstar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: glint 3s infinite linear;
         }
 
         .result-popup.ender {
             background: linear-gradient(135deg, #7209b7 0%, #3a0ca3 100%);
             border-color: #9d4edd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-popup.ender::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: glint 3s infinite linear;
         }
 
         .result-popup.masterball {
             background: linear-gradient(135deg, #ff595e 0%, #ff9f1c 100%);
             border-color: #ff9f1c;
+        }
+
+        .result-popup.cherish {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border-color: #ff6b6b;
         }
 
         @keyframes popupAppear {
@@ -513,7 +582,8 @@
         .result-popup.shiny h2,
         .result-popup.netherstar h2,
         .result-popup.ender h2,
-        .result-popup.masterball h2 {
+        .result-popup.masterball h2,
+        .result-popup.cherish h2 {
             color: white;
         }
 
@@ -544,7 +614,8 @@
         .result-popup.shiny .result-pokemon-name,
         .result-popup.netherstar .result-pokemon-name,
         .result-popup.ender .result-pokemon-name,
-        .result-popup.masterball .result-pokemon-name {
+        .result-popup.masterball .result-pokemon-name,
+        .result-popup.cherish .result-pokemon-name {
             color: white;
         }
 
@@ -588,6 +659,18 @@
             display: inline-block;
             background: white;
             color: #ff595e;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 700;
+            margin-top: 10px;
+            animation: shimmer 2s infinite;
+        }
+
+        .result-cherish-badge {
+            display: inline-block;
+            background: white;
+            color: #ff6b6b;
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9em;
@@ -756,6 +839,7 @@
             <div id="netherstarBadge" style="display: none;" class="result-netherstar-badge">🌟 NETHER STAR 🌟</div>
             <div id="enderBadge" style="display: none;" class="result-ender-badge">👁️ EYES OF ENDER 👁️</div>
             <div id="masterballBadge" style="display: none;" class="result-masterball-badge">🎾 MASTERBALL 🎾</div>
+            <div id="cherishBadge" style="display: none;" class="result-cherish-badge">❤️ CHERISH BALL ❤️</div>
         </div>
         <button class="close-popup" onclick="closePopup()">Close</button>
     </div>
@@ -766,6 +850,7 @@
             { name: 'Nether Star', id: 'nether_star', count: 1, type: 'netherstar', rarity: 'legendary', isMinecraft: true },
             { name: 'Eyes of Ender', id: 'ender_eye', count: 8, type: 'ender', rarity: 'rare', isMinecraft: true },
             { name: 'Masterball', id: 'masterball', count: 1, type: 'masterball', rarity: 'legendary', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' },
+            { name: 'Cherish Ball', id: 'cherish_ball', count: 8, type: 'cherish', rarity: 'rare', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/cherish-ball.png' },
             { name: 'Diamond', id: 'diamond', count: 10, type: 'rare', isMinecraft: true },
             { name: 'Netherite Scrap', id: 'netherite_scrap', count: 3, type: 'rare', isMinecraft: true },
             { name: 'Ultra Ball', id: 'ultra_ball', count: 64, type: 'pokeball', rarity: 'uncommon', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png' },
@@ -792,6 +877,9 @@
             { name: 'Regieleki', id: 894, shiny: false },
             { name: 'Regidrago', id: 895, shiny: false },
             { name: 'Zarude', id: 893, shiny: false },
+            // Paradox Pokemon
+            { name: 'Walking Wake', id: 1009, shiny: false, rarity: 'legendary' },
+            { name: 'Iron Leaves', id: 1010, shiny: false, rarity: 'legendary' },
             // Shiny only Pokemon (more common)
             { name: 'Umbreon', id: 197, shiny: true, rarity: 'common' },
             { name: 'Espeon', id: 196, shiny: true, rarity: 'common' },
@@ -799,7 +887,14 @@
             { name: 'Metagross', id: 376, shiny: true, rarity: 'common' },
             { name: 'Mismagius', id: 429, shiny: true, rarity: 'common' },
             { name: 'Gliscor', id: 472, shiny: true, rarity: 'common' },
-            { name: 'Gigalith', id: 526, shiny: true, rarity: 'common' }
+            { name: 'Gigalith', id: 526, shiny: true, rarity: 'common' },
+            // New shiny-only additions
+            { name: 'Gardevoir', id: 282, shiny: true, rarity: 'common' },
+            { name: 'Luxray', id: 405, shiny: true, rarity: 'common' },
+            { name: 'Togekiss', id: 468, shiny: true, rarity: 'common' },
+            { name: 'Gallade', id: 475, shiny: true, rarity: 'common' },
+            { name: 'Noivern', id: 715, shiny: true, rarity: 'common' },
+            { name: 'Sneasler', id: 903, shiny: true, rarity: 'common' }
         ];
 
         const eventLegendaries = [
@@ -810,15 +905,31 @@
             { name: 'Rayquaza', id: 384, shiny: false },
             { name: 'Xerneas', id: 716, shiny: false },
             { name: 'Latias', id: 380, shiny: false },
-            { name: 'Latios', id: 381, shiny: false }
+            { name: 'Latios', id: 381, shiny: false },
+            // New shiny-only event additions
+            { name: 'Naganadel', id: 804, shiny: true, rarity: 'legendary' },
+            { name: 'Spiritomb', id: 442, shiny: true, rarity: 'legendary' },
+            { name: 'Lucario', id: 448, shiny: true, rarity: 'legendary' },
+            { name: 'Zoroark', id: 571, shiny: true, rarity: 'legendary' },
+            { name: 'Haxorus', id: 612, shiny: true, rarity: 'legendary' },
+            { name: 'Sylveon', id: 700, shiny: true, rarity: 'legendary' },
+            { name: 'Dragapult', id: 887, shiny: true, rarity: 'legendary' }
         ];
 
-        // Additional Pokemon for hourly spin (non-shiny only)
+        // Additional Pokemon for hourly spin (all shiny)
         const hourlyPokemon = [
-            { name: 'Growlithe', id: 58, shiny: false },
-            { name: 'Machop', id: 66, shiny: false },
-            { name: 'Dratini', id: 147, shiny: false },
-            { name: 'Ralts', id: 280, shiny: false }
+            { name: 'Growlithe', id: 58, shiny: true, rarity: 'uncommon' },
+            { name: 'Machop', id: 66, shiny: true, rarity: 'uncommon' },
+            { name: 'Dratini', id: 147, shiny: true, rarity: 'uncommon' },
+            { name: 'Ralts', id: 280, shiny: true, rarity: 'uncommon' },
+            // New shiny starter additions (rarer than common drops)
+            { name: 'Bulbasaur', id: 1, shiny: true, rarity: 'rare' },
+            { name: 'Charmander', id: 4, shiny: true, rarity: 'rare' },
+            { name: 'Squirtle', id: 7, shiny: true, rarity: 'rare' },
+            { name: 'Treecko', id: 252, shiny: true, rarity: 'rare' },
+            { name: 'Torchic', id: 255, shiny: true, rarity: 'rare' },
+            { name: 'Mudkip', id: 258, shiny: true, rarity: 'rare' },
+            { name: 'Charcadet', id: 935, shiny: true, rarity: 'rare' }
         ];
 
         let currentWheel = 'normal';
@@ -829,6 +940,7 @@
         const SHINY_CHANCE = 0.01;
         const SHINY_ONLY_CHANCE = 0.10; // 10% chance for shiny-only Pokemon in normal wheel
         const MASTERBALL_CHANCE = 0.01; // Same as Nether Star rarity
+        const RARE_SHINY_CHANCE = 0.03; // 3% chance for rare shiny starters in hourly
         let rouletteItems = [];
 
         // Load saved login from localStorage
@@ -998,12 +1110,14 @@
                     const isNetherstar = item.type === 'netherstar';
                     const isEnder = item.type === 'ender';
                     const isMasterball = item.type === 'masterball';
+                    const isCherish = item.type === 'cherish';
+                    const isPokemon = item.id <= 1000;
                     
                     rouletteItems.push({
                         ...item,
-                        isShiny: false,
-                        type: isNetherstar ? 'netherstar' : (isEnder ? 'ender' : (isMasterball ? 'masterball' : 'normal')),
-                        isPokemon: item.id <= 1000 // Assuming Pokemon IDs are less than 1000
+                        isShiny: isPokemon, // All hourly Pokemon are shiny
+                        type: isNetherstar ? 'netherstar' : (isEnder ? 'ender' : (isMasterball ? 'masterball' : (isCherish ? 'cherish' : 'normal'))),
+                        isPokemon: isPokemon
                     });
                     
                     const div = document.createElement('div');
@@ -1013,15 +1127,20 @@
                         div.className = 'roulette-item ender';
                     } else if (isMasterball) {
                         div.className = 'roulette-item masterball';
+                    } else if (isCherish) {
+                        div.className = 'roulette-item cherish';
+                    } else if (isPokemon) {
+                        div.className = 'roulette-item shiny';
                     } else {
                         div.className = 'roulette-item';
                     }
                     
-                    if (item.id <= 1000) { // It's a Pokemon
+                    if (isPokemon) { // It's a Pokemon
                         div.innerHTML = `
-                            <img src="${getSprite(item.id, false)}" alt="${item.name}">
+                            <img src="${getSprite(item.id, true)}" alt="${item.name}">
                             <div class="roulette-item-name">${item.name}</div>
                             <div class="item-count">Lvl 1</div>
+                            <div class="shiny-badge">SHINY</div>
                         `;
                     } else { // It's a Minecraft item or Pokéball
                         const spriteUrl = item.sprite || getMinecraftSprite(item.id);
@@ -1088,6 +1207,9 @@
                     if (item.type === 'masterball') {
                         listItem.style.background = 'linear-gradient(135deg, rgba(255,89,94,0.2) 0%, rgba(255,159,28,0.2) 100%)';
                         listItem.style.borderColor = '#ff9f1c';
+                    } else if (item.type === 'cherish') {
+                        listItem.style.background = 'linear-gradient(135deg, rgba(255,107,107,0.2) 0%, rgba(238,90,36,0.2) 100%)';
+                        listItem.style.borderColor = '#ff6b6b';
                     }
                     const spriteUrl = item.sprite || getMinecraftSprite(item.id);
                     listItem.innerHTML = `
@@ -1097,13 +1219,15 @@
                     list.appendChild(listItem);
                 });
                 
-                // Show Pokemon
+                // Show Pokemon (all shiny)
                 hourlyPokemon.forEach(pokemon => {
                     const item = document.createElement('div');
                     item.className = 'pokemon-item';
+                    item.style.background = 'linear-gradient(135deg, rgba(255,214,10,0.2) 0%, rgba(255,183,3,0.2) 100%)';
+                    item.style.borderColor = '#ffd60a';
                     item.innerHTML = `
-                        <img class="pokemon-sprite" src="${getSprite(pokemon.id)}" alt="${pokemon.name}">
-                        <span>${pokemon.name} (Lvl 1)</span>
+                        <img class="pokemon-sprite" src="${getSprite(pokemon.id, true)}" alt="${pokemon.name}">
+                        <span>${pokemon.name} ✨ (Lvl 1)</span>
                     `;
                     list.appendChild(item);
                 });
@@ -1124,9 +1248,14 @@
                     const isShinyOnly = pokemon.shiny === true;
                     const itemLevel = isShinyOnly ? shinyLevel : level;
                     
+                    if (isShinyOnly) {
+                        item.style.background = 'linear-gradient(135deg, rgba(255,214,10,0.2) 0%, rgba(255,183,3,0.2) 100%)';
+                        item.style.borderColor = '#ffd60a';
+                    }
+                    
                     item.innerHTML = `
                         <img class="pokemon-sprite" src="${getSprite(pokemon.id, isShinyOnly)}" alt="${pokemon.name}">
-                        <span>${pokemon.name}${isShinyOnly ? ' (Shiny)' : ''} (Lvl ${itemLevel})</span>
+                        <span>${pokemon.name}${isShinyOnly ? ' ✨' : ''} (Lvl ${itemLevel})</span>
                     `;
                     list.appendChild(item);
                 });
@@ -1296,11 +1425,12 @@
                     if (!hourlyWins[selectedPlayer]) hourlyWins[selectedPlayer] = [];
                     
                     // Check if it's a Pokemon or Minecraft item
-                    if (winningItemData.id <= 1000) { // Pokemon
+                    if (winningItemData.isPokemon) { // Pokemon
                         hourlyWins[selectedPlayer].push({
                             pokemon: winningItemData.name,
                             id: winningItemData.id,
                             isPokemon: true,
+                            isShiny: true,
                             level: 1,
                             timestamp: new Date().toISOString()
                         });
@@ -1318,7 +1448,7 @@
                     localStorage.setItem('hourly_wins_history', JSON.stringify(hourlyWins));
                     
                     // Show result with the actual item that landed
-                    showResult(winningItemData, false);
+                    showResult(winningItemData, winningItemData.isPokemon); // Hourly Pokemon are always shiny
                 } else {
                     const tokenType = currentWheel === 'normal' ? 'normal' : 'event';
                     const historyKey = selectedPlayer + (tokenType === 'event' ? '_event' : '');
@@ -1369,20 +1499,24 @@
             const netherstarBadge = document.getElementById('netherstarBadge');
             const enderBadge = document.getElementById('enderBadge');
             const masterballBadge = document.getElementById('masterballBadge');
+            const cherishBadge = document.getElementById('cherishBadge');
             
-            popup.classList.remove('shiny', 'netherstar', 'ender', 'masterball');
+            popup.classList.remove('shiny', 'netherstar', 'ender', 'masterball', 'cherish');
             shinyBadge.style.display = 'none';
             netherstarBadge.style.display = 'none';
             enderBadge.style.display = 'none';
             masterballBadge.style.display = 'none';
+            cherishBadge.style.display = 'none';
             
             if (currentWheel === 'hourly') {
                 // Check if it's a Pokemon or Minecraft item
-                if (item.id <= 1000) { // Pokemon
-                    sprite.src = getSprite(item.id, false);
+                if (item.isPokemon) { // Pokemon
+                    sprite.src = getSprite(item.id, true);
                     name.textContent = item.name;
                     levelDisplay.textContent = `Level: 1`;
-                    title.textContent = 'Hourly Pokémon! 🎁';
+                    popup.classList.add('shiny');
+                    title.textContent = '🌟 SHINY POKÉMON! 🌟';
+                    shinyBadge.style.display = 'block';
                 } else { // Minecraft item
                     sprite.src = item.sprite || getMinecraftSprite(item.id);
                     
@@ -1404,6 +1538,12 @@
                         popup.classList.add('masterball');
                         title.textContent = '🎾 MASTERBALL! 🎾';
                         masterballBadge.style.display = 'block';
+                    } else if (item.type === 'cherish') {
+                        name.textContent = `${item.name} (${item.count}x)`;
+                        levelDisplay.textContent = '';
+                        popup.classList.add('cherish');
+                        title.textContent = '❤️ CHERISH BALLS! ❤️';
+                        cherishBadge.style.display = 'block';
                     } else {
                         name.textContent = `${item.name} (${item.count}x)`;
                         levelDisplay.textContent = '';
