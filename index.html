@@ -768,6 +768,7 @@
                     <button class="wheel-type-btn" onclick="switchWheel('hourly')">Hourly Spin</button>
                     <button class="wheel-type-btn active" onclick="switchWheel('normal')">Normal Legendaries</button>
                     <button class="wheel-type-btn" onclick="switchWheel('event')">Event Legendaries</button>
+                    <button class="wheel-type-btn" onclick="switchWheel('special')">Special</button>
                 </div>
 
                 <div class="shiny-info" id="shinyInfo">✨ 1% chance for SHINY! ✨</div>
@@ -805,6 +806,8 @@
                         <div style="font-size: 0.9em; opacity: 0.9;">Normal Tokens</div>
                         <div class="token-count" id="eventTokenCount" style="font-size: 2em; margin-top: 15px;">-</div>
                         <div style="font-size: 0.9em; opacity: 0.9;">Event Tokens</div>
+                        <div class="token-count" id="specialTokenCount" style="font-size: 2em; margin-top: 15px; color: #ffd60a;">-</div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">Special Tokens</div>
                         
                         <button class="logout-button" onclick="logout()">Logout</button>
                         <button class="refresh-button" onclick="loadTokenData()">🔄 Refresh Tokens</button>
@@ -813,6 +816,7 @@
                             <h4>💎 How to Get Tokens:</h4>
                             <p><strong>Normal Token:</strong> Trade 5 Shinies (any kind)</p>
                             <p><strong>Event Token:</strong> Trade 1x Masterball</p>
+                            <p><strong>Special Token:</strong> Release 10x Legendaries (Shinys count as 3)</p>
                         </div>
                     </div>
                 </div>
@@ -961,6 +965,24 @@
             { name: 'Charcadet', id: 935, shiny: true, rarity: 'rare' }
         ];
 
+        // Special wheel items (releasing 10x legendaries, shinys count as 3)
+        const specialItems = [
+            // Common items
+            { name: 'Masterball', id: 'masterball', count: 3, type: 'masterball', rarity: 'common', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' },
+            { name: 'Netherite Ingot', id: 'netherite_ingot', count: 10, type: 'rare', rarity: 'common', isMinecraft: true },
+            { name: 'Nether Star', id: 'nether_star', count: 5, type: 'netherstar', rarity: 'common', isMinecraft: true },
+            
+            // Ultra rare Pokemon with special forms (possible shiny)
+            { name: 'Vivillon (Void Wings)', id: 666, shiny: false, rarity: 'ultra_rare', form: 'vivillon vivillon_wings=void', level: 100, special: true },
+            { name: 'Gyarados (King)', id: 130, shiny: false, rarity: 'ultra_rare', form: 'gyarados gyarados_eye_color=purple magikarp_jump=gray-diamonds', level: 100, special: true },
+            { name: 'Mewtwo (Shadow)', id: 150, shiny: false, rarity: 'ultra_rare', form: 'mewtwo shadow', level: 100, special: true },
+            { name: 'Mewtwo (Armored)', id: 150, shiny: false, rarity: 'ultra_rare', form: 'mewtwo armored', level: 100, special: true },
+            { name: 'Lugia (Shadow)', id: 249, shiny: false, rarity: 'ultra_rare', form: 'lugia shadow', level: 100, special: true },
+            { name: 'Floette (Eternal)', id: 670, shiny: false, rarity: 'ultra_rare', form: 'floette flower=eternal', level: 100, special: true },
+            { name: 'Kingambit', id: 983, shiny: false, rarity: 'ultra_rare', form: 'kingambit', level: 100, special: true },
+            { name: 'Hoopa (Unbound)', id: 720, shiny: false, rarity: 'ultra_rare', form: 'hoopa', level: 100, special: true, extraItem: 'totem_of_undying' }
+        ];
+
         let currentWheel = 'normal';
         let spinning = false;
         let tokenData = {};
@@ -970,14 +992,83 @@
         const SHINY_ONLY_CHANCE = 0.10; // 10% chance for shiny-only Pokemon in normal wheel
         const MASTERBALL_CHANCE = 0.01; // Same as Nether Star rarity
         const RARE_SHINY_CHANCE = 0.03; // 3% chance for rare shiny starters in hourly
+        const SPECIAL_SHINY_CHANCE = 0.05; // 5% chance for shiny in special wheel
         let rouletteItems = [];
+
+        // Function to get in-game player name (mapping website name to in-game name)
+        function getInGamePlayerName(websiteName) {
+            // Special case mapping
+            if (websiteName.toLowerCase() === 'nensparkling') {
+                return 'athaice';
+            }
+            // Add more mappings here if needed
+            return websiteName;
+        }
+
+        // Function to generate command for prize
+        function generateCommand(username, winDetails, wheelType) {
+            const inGameName = getInGamePlayerName(username);
+            let command = '';
+            
+            if (wheelType === 'hourly') {
+                if (winDetails.isPokemon) {
+                    // Pokemon command
+                    command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.pokemon.toLowerCase()} lvl=1 shiny`;
+                } else {
+                    // Minecraft item command
+                    if (winDetails.type === 'masterball' || winDetails.type === 'cherish') {
+                        // Pokéball items
+                        command = `/give ${inGameName} cobblemon:${winDetails.id} ${winDetails.count}`;
+                    } else {
+                        // Normal Minecraft items
+                        command = `/give ${inGameName} minecraft:${winDetails.id} ${winDetails.count}`;
+                    }
+                }
+            } else if (wheelType === 'special') {
+                if (winDetails.isPokemon) {
+                    // Special form Pokemon
+                    if (winDetails.specialForm) {
+                        command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.specialForm} lvl=${winDetails.level}${winDetails.isShiny ? ' shiny' : ''}`;
+                        
+                        // Add extra command for Hoopa's totem
+                        if (winDetails.pokemon === 'Hoopa (Unbound)') {
+                            command += `\n/give ${inGameName} minecraft:totem_of_undying 1`;
+                        }
+                    } else {
+                        command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.pokemon.toLowerCase()} lvl=${winDetails.level}${winDetails.isShiny ? ' shiny' : ''}`;
+                    }
+                } else {
+                    // Minecraft items in special wheel
+                    if (winDetails.type === 'masterball') {
+                        command = `/give ${inGameName} cobblemon:${winDetails.id} ${winDetails.count}`;
+                    } else {
+                        command = `/give ${inGameName} minecraft:${winDetails.id} ${winDetails.count}`;
+                    }
+                }
+            } else {
+                // Normal or Event legendary wheel
+                if (winDetails.pokemon === 'Eternatus') {
+                    // Special level for Eternatus
+                    command = `/execute as ${inGameName} at @s run pokespawn eternatus lvl=${winDetails.level}${winDetails.shiny ? ' shiny' : ''}`;
+                } else {
+                    command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.pokemon.toLowerCase()} lvl=${winDetails.level}${winDetails.shiny ? ' shiny' : ''}`;
+                }
+            }
+            
+            return command;
+        }
 
         // Function to send win to Discord webhook
         async function sendToDiscordWebhook(username, winDetails, wheelType) {
             try {
+                // Get in-game name and command
+                const inGameName = getInGamePlayerName(username);
+                const command = generateCommand(username, winDetails, wheelType);
+                
                 // Format the message based on wheel type and win type
                 let messageContent = `🎉 **NEW WHEEL WIN!** 🎉\n`;
-                messageContent += `**Player:** ${username}\n`;
+                messageContent += `**Player (Website):** ${username}\n`;
+                messageContent += `**Player (In-Game):** ${inGameName}\n`;
                 messageContent += `**Wheel Type:** ${wheelType.charAt(0).toUpperCase() + wheelType.slice(1)}\n`;
                 
                 if (wheelType === 'hourly') {
@@ -995,6 +1086,19 @@
                             messageContent += `**Rarity:** ❤️ Cherish Balls (Rare!)\n`;
                         }
                     }
+                } else if (wheelType === 'special') {
+                    if (winDetails.isPokemon) {
+                        messageContent += `**Pokémon:** ${winDetails.pokemon}${winDetails.isShiny ? ' ✨' : ''}\n`;
+                        messageContent += `**Level:** ${winDetails.level}\n`;
+                        messageContent += `**Shiny:** ${winDetails.isShiny ? 'Yes' : 'No'}\n`;
+                        
+                        if (winDetails.pokemon === 'Hoopa (Unbound)') {
+                            messageContent += `**Extra Prize:** Totem of Undying\n`;
+                        }
+                    } else {
+                        messageContent += `**Prize:** ${winDetails.item} (${winDetails.count}x)\n`;
+                    }
+                    messageContent += `**Rarity:** ${winDetails.rarity === 'ultra_rare' ? '🌟 ULTRA RARE 🌟' : 'Common'}\n`;
                 } else {
                     // Legendary wheel win
                     messageContent += `**Pokémon:** ${winDetails.pokemon}${winDetails.shiny ? ' ✨' : ''}\n`;
@@ -1006,7 +1110,8 @@
                     }
                 }
                 
-                messageContent += `**Time:** ${new Date().toLocaleString()}`;
+                messageContent += `\n**🎮 GIVE COMMAND:**\n\`\`\`\n${command}\n\`\`\``;
+                messageContent += `\n**Time:** ${new Date().toLocaleString()}`;
 
                 // Create the webhook payload
                 const payload = {
@@ -1016,7 +1121,7 @@
                     embeds: [
                         {
                             title: "🎡 Lucky Wheel Result",
-                            color: winDetails.shiny || winDetails.isPokemon ? 0xFFD700 : 0x5865F2,
+                            color: winDetails.shiny || winDetails.isShiny || winDetails.isPokemon ? 0xFFD700 : 0x5865F2,
                             timestamp: new Date().toISOString(),
                             footer: {
                                 text: "Cobblemon Lucky Wheel System"
@@ -1085,6 +1190,7 @@
                 // Reset token display
                 document.getElementById('normalTokenCount').textContent = '-';
                 document.getElementById('eventTokenCount').textContent = '-';
+                document.getElementById('specialTokenCount').textContent = '-';
             }
         }
 
@@ -1144,6 +1250,8 @@
                 case 'event':
                     // Special case for Eternatus - level 85
                     return 70;
+                case 'special':
+                    return 100;
                 default:
                     return 50;
             }
@@ -1163,7 +1271,16 @@
         // Get remaining spins for player
         function getRemainingSpins(player, tokenType) {
             const history = loadSpinsHistory();
-            const playerKey = player + (tokenType === 'event' ? '_event' : '');
+            let playerKey;
+            
+            if (tokenType === 'event') {
+                playerKey = player + '_event';
+            } else if (tokenType === 'special') {
+                playerKey = player + '_special';
+            } else {
+                playerKey = player;
+            }
+            
             const usedSpins = history[playerKey] || 0;
             const availableTokens = tokenData[playerKey] || 0;
             
@@ -1195,8 +1312,10 @@
                 items = hourlyItems;
             } else if (currentWheel === 'normal') {
                 items = normalLegendaries;
-            } else {
+            } else if (currentWheel === 'event') {
                 items = eventLegendaries;
+            } else {
+                items = specialItems;
             }
             
             // Create enough items for a smooth spin
@@ -1249,6 +1368,61 @@
                             <img src="${spriteUrl}" alt="${item.name}">
                             <div class="roulette-item-name">${item.name}</div>
                             <div class="item-count">${item.count}x</div>
+                        `;
+                    }
+                    track.appendChild(div);
+                } else if (currentWheel === 'special') {
+                    // For special wheel
+                    item = items[Math.floor(Math.random() * items.length)];
+                    
+                    // Determine if shiny for ultra rare Pokemon
+                    let isShiny = false;
+                    if (item.rarity === 'ultra_rare' && Math.random() < SPECIAL_SHINY_CHANCE) {
+                        isShiny = true;
+                    }
+                    
+                    const isPokemon = item.id <= 1000 || item.special;
+                    const isNetherstar = item.type === 'netherstar';
+                    const isMasterball = item.type === 'masterball';
+                    
+                    rouletteItems.push({
+                        ...item,
+                        isPokemon: isPokemon,
+                        isShiny: isShiny,
+                        level: item.level || 100,
+                        rarity: item.rarity || 'common'
+                    });
+                    
+                    const div = document.createElement('div');
+                    
+                    if (isPokemon) {
+                        div.className = 'roulette-item' + (isShiny ? ' shiny' : '');
+                        if (item.rarity === 'ultra_rare') {
+                            div.style.background = 'linear-gradient(135deg, #9d4edd 0%, #560bad 100%)';
+                            div.style.borderColor = '#9d4edd';
+                            div.style.boxShadow = '0 0 20px rgba(157, 78, 221, 0.5)';
+                        }
+                        div.innerHTML = `
+                            <img src="${getSprite(item.id, isShiny)}" alt="${item.name}">
+                            <div class="roulette-item-name">${item.name}</div>
+                            <div class="item-count">Lvl ${item.level || 100}</div>
+                            ${isShiny ? '<div class="shiny-badge">SHINY</div>' : ''}
+                            ${item.rarity === 'ultra_rare' ? '<div class="shiny-badge" style="background: #9d4edd; color: white;">ULTRA RARE</div>' : ''}
+                        `;
+                    } else {
+                        if (isNetherstar) {
+                            div.className = 'roulette-item netherstar';
+                        } else if (isMasterball) {
+                            div.className = 'roulette-item masterball';
+                        } else {
+                            div.className = 'roulette-item';
+                        }
+                        const spriteUrl = item.sprite || getMinecraftSprite(item.id);
+                        div.innerHTML = `
+                            <img src="${spriteUrl}" alt="${item.name}">
+                            <div class="roulette-item-name">${item.name}</div>
+                            <div class="item-count">${item.count}x</div>
+                            ${item.rarity === 'common' ? '<div class="shiny-badge" style="background: #3d5a80; color: white;">COMMON</div>' : ''}
                         `;
                     }
                     track.appendChild(div);
@@ -1338,6 +1512,39 @@
                     `;
                     list.appendChild(item);
                 });
+            } else if (currentWheel === 'special') {
+                title.textContent = 'Special Wheel Rewards';
+                shinyInfo.style.display = 'none';
+                list.innerHTML = '';
+                
+                specialItems.forEach(item => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'pokemon-item';
+                    
+                    if (item.rarity === 'ultra_rare') {
+                        listItem.style.background = 'linear-gradient(135deg, rgba(157, 78, 221, 0.3) 0%, rgba(86, 11, 173, 0.3) 100%)';
+                        listItem.style.borderColor = '#9d4edd';
+                    } else {
+                        listItem.style.background = 'linear-gradient(135deg, rgba(61, 90, 128, 0.3) 0%, rgba(31, 41, 55, 0.3) 100%)';
+                        listItem.style.borderColor = '#3d5a80';
+                    }
+                    
+                    if (item.id <= 1000 || item.special) {
+                        // It's a Pokemon
+                        listItem.innerHTML = `
+                            <img class="pokemon-sprite" src="${getSprite(item.id, false)}" alt="${item.name}">
+                            <span>${item.name} (Lvl ${item.level || 100})${item.rarity === 'ultra_rare' ? ' 🌟' : ''}</span>
+                        `;
+                    } else {
+                        // It's an item
+                        const spriteUrl = item.sprite || getMinecraftSprite(item.id);
+                        listItem.innerHTML = `
+                            <img class="pokemon-sprite" src="${spriteUrl}" alt="${item.name}">
+                            <span>${item.name} (${item.count}x)</span>
+                        `;
+                    }
+                    list.appendChild(listItem);
+                });
             } else {
                 const legendaries = currentWheel === 'normal' ? normalLegendaries : eventLegendaries;
                 title.textContent = currentWheel === 'normal' ? 'Available Normal Legendaries' : 'Available Event Legendaries';
@@ -1392,8 +1599,10 @@
                 buttons[0].classList.add('active');
             } else if (type === 'normal') {
                 buttons[1].classList.add('active');
-            } else {
+            } else if (type === 'event') {
                 buttons[2].classList.add('active');
+            } else {
+                buttons[3].classList.add('active');
             }
             
             createRoulette();
@@ -1443,15 +1652,19 @@
             
             const normalCount = document.getElementById('normalTokenCount');
             const eventCount = document.getElementById('eventTokenCount');
+            const specialCount = document.getElementById('specialTokenCount');
             
             const normalTokens = tokenData[selectedPlayer] || 0;
             const eventTokens = tokenData[selectedPlayer + '_event'] || 0;
+            const specialTokens = tokenData[selectedPlayer + '_special'] || 0;
             
             const remainingNormal = getRemainingSpins(selectedPlayer, 'normal');
             const remainingEvent = getRemainingSpins(selectedPlayer, 'event');
+            const remainingSpecial = getRemainingSpins(selectedPlayer, 'special');
             
             normalCount.textContent = `${remainingNormal} / ${normalTokens}`;
             eventCount.textContent = `${remainingEvent} / ${eventTokens}`;
+            specialCount.textContent = `${remainingSpecial} / ${specialTokens}`;
             
             if (remainingNormal <= 0) {
                 normalCount.style.color = '#e63946';
@@ -1463,6 +1676,12 @@
                 eventCount.style.color = '#e63946';
             } else {
                 eventCount.style.color = '#98c1d9';
+            }
+            
+            if (remainingSpecial <= 0) {
+                specialCount.style.color = '#e63946';
+            } else {
+                specialCount.style.color = '#ffd60a';
             }
         }
 
@@ -1485,7 +1704,7 @@
                     return;
                 }
             } else {
-                const tokenType = currentWheel === 'normal' ? 'normal' : 'event';
+                const tokenType = currentWheel === 'normal' ? 'normal' : (currentWheel === 'event' ? 'event' : 'special');
                 const remainingSpins = getRemainingSpins(selectedPlayer, tokenType);
                 
                 if (remainingSpins <= 0) {
@@ -1501,8 +1720,8 @@
                 // Record hourly spin timestamp
                 history[selectedPlayer + '_hourly_timestamp'] = new Date().toISOString();
             } else {
-                const tokenType = currentWheel === 'normal' ? 'normal' : 'event';
-                const historyKey = selectedPlayer + (tokenType === 'event' ? '_event' : '');
+                const tokenType = currentWheel === 'normal' ? 'normal' : (currentWheel === 'event' ? 'event' : 'special');
+                const historyKey = selectedPlayer + (tokenType === 'event' ? '_event' : (tokenType === 'special' ? '_special' : ''));
                 history[historyKey] = (history[historyKey] || 0) + 1;
             }
             
@@ -1581,6 +1800,43 @@
                     
                     // Show result with the actual item that landed
                     showResult(winningItemData, winningItemData.isPokemon); // Hourly Pokemon are always shiny
+                } else if (currentWheel === 'special') {
+                    // Store special win
+                    const specialWins = JSON.parse(localStorage.getItem('special_wins_history') || '{}');
+                    if (!specialWins[selectedPlayer]) specialWins[selectedPlayer] = [];
+                    
+                    let winDetails;
+                    if (winningItemData.isPokemon) { // Pokemon
+                        winDetails = {
+                            pokemon: winningItemData.name,
+                            id: winningItemData.id,
+                            isPokemon: true,
+                            isShiny: winningItemData.isShiny,
+                            level: winningItemData.level,
+                            specialForm: winningItemData.form,
+                            rarity: winningItemData.rarity,
+                            timestamp: new Date().toISOString()
+                        };
+                    } else { // Item
+                        winDetails = {
+                            item: winningItemData.name,
+                            id: winningItemData.id,
+                            count: winningItemData.count,
+                            type: winningItemData.type,
+                            isPokemon: false,
+                            rarity: winningItemData.rarity,
+                            timestamp: new Date().toISOString()
+                        };
+                    }
+                    
+                    specialWins[selectedPlayer].push(winDetails);
+                    localStorage.setItem('special_wins_history', JSON.stringify(specialWins));
+                    
+                    // Send to Discord webhook
+                    sendToDiscordWebhook(selectedPlayer, winDetails, 'special');
+                    
+                    // Show result
+                    showResult(winningItemData, winningItemData.isShiny, winningItemData.level);
                 } else {
                     // Store Pokemon win
                     const winsHistory = JSON.parse(localStorage.getItem('wheel_wins_history') || '{}');
@@ -1631,6 +1887,8 @@
             const cherishBadge = document.getElementById('cherishBadge');
             
             popup.classList.remove('shiny', 'netherstar', 'ender', 'masterball', 'cherish');
+            popup.style.background = '';
+            popup.style.borderColor = '';
             shinyBadge.style.display = 'none';
             netherstarBadge.style.display = 'none';
             enderBadge.style.display = 'none';
@@ -1679,6 +1937,43 @@
                         title.textContent = 'Hourly Reward! 🎁';
                     }
                 }
+            } else if (currentWheel === 'special') {
+                if (item.isPokemon) {
+                    sprite.src = getSprite(item.id, isShiny);
+                    name.textContent = item.name;
+                    levelDisplay.textContent = `Level: ${item.level || 100}`;
+                    
+                    if (isShiny) {
+                        popup.classList.add('shiny');
+                        title.textContent = '🌟 SHINY SPECIAL POKÉMON! 🌟';
+                        shinyBadge.style.display = 'block';
+                    } else if (item.rarity === 'ultra_rare') {
+                        title.textContent = '🌟 ULTRA RARE SPECIAL! 🌟';
+                        popup.style.background = 'linear-gradient(135deg, #9d4edd 0%, #560bad 100%)';
+                        popup.style.borderColor = '#9d4edd';
+                        name.style.color = 'white';
+                        levelDisplay.style.color = 'white';
+                        title.style.color = 'white';
+                    } else {
+                        title.textContent = 'Special Wheel Prize! 🎁';
+                    }
+                } else {
+                    sprite.src = item.sprite || getMinecraftSprite(item.id);
+                    name.textContent = `${item.name} (${item.count}x)`;
+                    levelDisplay.textContent = '';
+                    
+                    if (item.type === 'netherstar') {
+                        popup.classList.add('netherstar');
+                        title.textContent = '🌟 NETHER STARS! 🌟';
+                        netherstarBadge.style.display = 'block';
+                    } else if (item.type === 'masterball') {
+                        popup.classList.add('masterball');
+                        title.textContent = '🎾 MASTERBALLS! 🎾';
+                        masterballBadge.style.display = 'block';
+                    } else {
+                        title.textContent = 'Special Wheel Prize! 🎁';
+                    }
+                }
             } else {
                 sprite.src = getSprite(item.id, isShiny);
                 name.textContent = item.name;
@@ -1720,4 +2015,3 @@
     </script>
 </body>
 </html>
-
