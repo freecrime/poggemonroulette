@@ -1220,7 +1220,7 @@
             { name: 'Palkia', id: 484, shiny: false },
             { name: 'Giratina', id: 487, shiny: false },
             { name: 'Darkrai', id: 491, shiny: false },
-            { name: 'Arceus', id: 493, shiny: false },
+            // Arceus removed from event wheel as requested
             { name: 'Reshiram', id: 643, shiny: false },
             { name: 'Zekrom', id: 644, shiny: false },
             { name: 'Kyurem', id: 646, shiny: false },
@@ -1268,12 +1268,20 @@
             // Ultra rare Pokemon with special forms (possible shiny)
             { name: 'Vivillon (Void Wings)', id: 666, shiny: false, rarity: 'ultra_rare', form: 'vivillon vivillon_wings=void', level: 100, special: true },
             { name: 'Gyarados (King)', id: 130, shiny: false, rarity: 'ultra_rare', form: 'gyarados gyarados_eye_color=purple magikarp_jump=gray-diamonds', level: 100, special: true },
-            { name: 'Mewtwo (Shadow)', id: 150, shiny: false, rarity: 'ultra_rare', form: 'mewtwo shadow', level: 100, special: true },
-            { name: 'Mewtwo (Armored)', id: 150, shiny: false, rarity: 'ultra_rare', form: 'mewtwo armored', level: 100, special: true },
-            { name: 'Lugia (Shadow)', id: 249, shiny: false, rarity: 'ultra_rare', form: 'lugia shadow', level: 100, special: true },
+            { name: 'Mewtwo (Shadow)', id: 150, shiny: true, rarity: 'ultra_rare', form: 'mewtwo shadow', level: 100, special: true }, // Always shiny
+            { name: 'Mewtwo (Armored)', id: 150, shiny: true, rarity: 'ultra_rare', form: 'mewtwo armored', level: 100, special: true }, // Always shiny
+            { name: 'Lugia (Shadow)', id: 249, shiny: true, rarity: 'ultra_rare', form: 'lugia shadow', level: 100, special: true }, // Always shiny
             { name: 'Floette (Eternal)', id: 670, shiny: false, rarity: 'ultra_rare', form: 'floette flower=eternal', level: 100, special: true },
             { name: 'Kingambit', id: 983, shiny: false, rarity: 'ultra_rare', form: 'kingambit', level: 100, special: true },
-            { name: 'Hoopa (Unbound)', id: 720, shiny: false, rarity: 'ultra_rare', form: 'hoopa', level: 100, special: true, extraItem: 'totem_of_undying' }
+            { name: 'Hoopa (Unbound)', id: 720, shiny: false, rarity: 'ultra_rare', form: 'hoopa', level: 100, special: true, extraItem: 'totem_of_undying' },
+            // New ultra rare additions
+            { name: 'White Kyurem', id: 646, shiny: false, rarity: 'ultra_rare', form: 'kyurem absofusion=white', level: 100, special: true },
+            { name: 'Black Kyurem', id: 646, shiny: false, rarity: 'ultra_rare', form: 'kyurem absofusion=black', level: 100, special: true },
+            { name: 'Arceus', id: 493, shiny: false, rarity: 'ultra_rare', form: 'arceus', level: 100, special: true },
+            { name: 'Necrozma (Dawn)', id: 800, shiny: false, rarity: 'ultra_rare', form: 'necrozma prism_fusion=dawn', level: 100, special: true },
+            { name: 'Necrozma (Dusk)', id: 800, shiny: false, rarity: 'ultra_rare', form: 'necrozma prism_fusion=dusk', level: 100, special: true },
+            { name: 'Red\'s Charizard', id: 6, shiny: false, rarity: 'ultra_rare', form: 'charizard', level: 100, special: true },
+            { name: 'Ursaluna (Bloodmoon)', id: 901, shiny: false, rarity: 'ultra_rare', form: 'ursaluna bloodmoon=true', level: 100, special: true }
         ];
 
         let currentWheel = 'normal';
@@ -1820,6 +1828,11 @@
                     // Determine if shiny for ultra rare Pokemon
                     let isShiny = false;
                     if (item.rarity === 'ultra_rare' && Math.random() < SPECIAL_SHINY_CHANCE) {
+                        isShiny = true;
+                    }
+                    
+                    // Special cases: Mewtwo Shadow, Mewtwo Armored, and Lugia Shadow are always shiny
+                    if (item.name === 'Mewtwo (Shadow)' || item.name === 'Mewtwo (Armored)' || item.name === 'Lugia (Shadow)') {
                         isShiny = true;
                     }
                     
