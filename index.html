@@ -212,6 +212,12 @@
             box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
         }
 
+        .roulette-item.golden {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb703 100%);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
         @keyframes glint {
             0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
@@ -244,6 +250,11 @@
         .roulette-item.cherish .roulette-item-name {
             color: white;
             text-shadow: 0 0 5px rgba(157, 78, 221, 0.8);
+        }
+
+        .roulette-item.golden .roulette-item-name {
+            color: #000;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.8);
         }
 
         .shiny-badge {
@@ -562,6 +573,11 @@
             border-color: #ff6b6b;
         }
 
+        .result-popup.golden {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb703 100%);
+            border-color: #ffd700;
+        }
+
         @keyframes popupAppear {
             from {
                 transform: translate(-50%, -50%) scale(0.5);
@@ -583,7 +599,8 @@
         .result-popup.netherstar h2,
         .result-popup.ender h2,
         .result-popup.masterball h2,
-        .result-popup.cherish h2 {
+        .result-popup.cherish h2,
+        .result-popup.golden h2 {
             color: white;
         }
 
@@ -615,7 +632,8 @@
         .result-popup.netherstar .result-pokemon-name,
         .result-popup.ender .result-pokemon-name,
         .result-popup.masterball .result-pokemon-name,
-        .result-popup.cherish .result-pokemon-name {
+        .result-popup.cherish .result-pokemon-name,
+        .result-popup.golden .result-pokemon-name {
             color: white;
         }
 
@@ -671,6 +689,18 @@
             display: inline-block;
             background: white;
             color: #ff6b6b;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 700;
+            margin-top: 10px;
+            animation: shimmer 2s infinite;
+        }
+
+        .result-golden-badge {
+            display: inline-block;
+            background: #000;
+            color: #ffd700;
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9em;
@@ -1086,6 +1116,7 @@
             <div id="enderBadge" style="display: none;" class="result-ender-badge">👁️ EYES OF ENDER 👁️</div>
             <div id="masterballBadge" style="display: none;" class="result-masterball-badge">🎾 MASTERBALL 🎾</div>
             <div id="cherishBadge" style="display: none;" class="result-cherish-badge">❤️ CHERISH BALL ❤️</div>
+            <div id="goldenBadge" style="display: none;" class="result-golden-badge">🌟 GOLDEN GMAX 🌟</div>
         </div>
         <button class="close-popup" onclick="closePopup()">Close</button>
     </div>
@@ -1145,7 +1176,7 @@
         const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463207027861094585/Fc8lWs42Z6VO3IE0j3iFqzGARohCidnKihDAWU33bqt42rfggEFHJmlJ9NEvjM-7DsSp';
         const DISCORD_IV_WEBHOOK_URL = 'https://discord.com/api/webhooks/1463926867185631245/22CqHhqbdfmIEVnFUXZgCXn2Bi6ut5o9MPCiUBS3caKC4w3IMm2a3hrbcqx3ov5jcFtK';
 
-        // Hourly Spin Items (with proper Pokéball sprites)
+        // Hourly Spin Items (with proper Pokéball sprites and new token pulls)
         const hourlyItems = [
             { name: 'Nether Star', id: 'nether_star', count: 1, type: 'netherstar', rarity: 'legendary', isMinecraft: true },
             { name: 'Eyes of Ender', id: 'ender_eye', count: 8, type: 'ender', rarity: 'rare', isMinecraft: true },
@@ -1156,13 +1187,11 @@
             { name: 'Ultra Ball', id: 'ultra_ball', count: 64, type: 'pokeball', rarity: 'uncommon', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png' },
             { name: 'Great Ball', id: 'great_ball', count: 32, type: 'pokeball', rarity: 'uncommon', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png' },
             { name: 'Quick Ball', id: 'quick_ball', count: 32, type: 'pokeball', rarity: 'uncommon', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/quick-ball.png' },
-            { name: 'Poke Ball', id: 'poke_ball', count: 64, type: 'pokeball', rarity: 'common', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png' },
-            { name: 'Iron Ingot', id: 'iron_ingot', count: 32, type: 'common', isMinecraft: true },
-            { name: 'Gold Ingot', id: 'gold_ingot', count: 32, type: 'common', isMinecraft: true },
-            { name: 'Emerald', id: 'emerald', count: 16, type: 'common', isMinecraft: true },
-            { name: 'Lapis Lazuli', id: 'lapis_lazuli', count: 32, type: 'common', isMinecraft: true },
-            { name: 'Redstone', id: 'redstone', count: 32, type: 'common', isMinecraft: true },
-            { name: 'Experience Bottle', id: 'experience_bottle', count: 16, type: 'common', isMinecraft: true }
+            // New token pulls
+            { name: '+1 Event Pull', id: 'event_token_1', count: 1, type: 'token', rarity: 'rare', isToken: true, tokenType: 'event', tokenAmount: 1 },
+            { name: '+5 Event Pulls', id: 'event_token_5', count: 5, type: 'token', rarity: 'legendary', isToken: true, tokenType: 'event', tokenAmount: 5 },
+            { name: '+1 Special Pull', id: 'special_token_1', count: 1, type: 'token', rarity: 'rare', isToken: true, tokenType: 'special', tokenAmount: 1 },
+            { name: '+3 Special Pulls', id: 'special_token_3', count: 3, type: 'token', rarity: 'legendary', isToken: true, tokenType: 'special', tokenAmount: 3 }
         ];
 
         // Pokemon lists
@@ -1231,6 +1260,14 @@
             { name: 'Zamazenta', id: 889, shiny: false },
             { name: 'Koraidon', id: 1007, shiny: false },
             { name: 'Miraidon', id: 1008, shiny: false },
+            // New event legendaries with correct spawn names
+            { name: 'Tapu Koko', id: 785, shiny: false, spawnName: 'tapukoko' },
+            { name: 'Tapu Lele', id: 786, shiny: false, spawnName: 'tapulele' },
+            { name: 'Tapu Bulu', id: 787, shiny: false, spawnName: 'tapubulu' },
+            { name: 'Tapu Fini', id: 788, shiny: false, spawnName: 'tapufini' },
+            { name: 'Tornadus', id: 641, shiny: false, spawnName: 'tornadus' },
+            { name: 'Thundurus', id: 642, shiny: false, spawnName: 'thundurus' },
+            { name: 'Landorus', id: 645, shiny: false, spawnName: 'landorus' },
             // New shiny-only event additions (Eternatus last in this section)
             { name: 'Spiritomb', id: 442, shiny: true, rarity: 'legendary' },
             { name: 'Lucario', id: 448, shiny: true, rarity: 'legendary' },
@@ -1266,11 +1303,24 @@
             { name: 'Nether Star', id: 'nether_star', count: 5, type: 'netherstar', rarity: 'common', isMinecraft: true },
             
             // Ultra rare Pokemon with special forms (possible shiny)
-            { name: 'Vivillon (Void Wings)', id: 666, shiny: false, rarity: 'ultra_rare', form: 'vivillon vivillon_wings=void', level: 100, special: true },
-            { name: 'Gyarados (King)', id: 130, shiny: false, rarity: 'ultra_rare', form: 'gyarados gyarados_eye_color=purple magikarp_jump=gray-diamonds', level: 100, special: true },
-            { name: 'Mewtwo (Shadow)', id: 150, shiny: true, rarity: 'ultra_rare', form: 'mewtwo shadow', level: 100, special: true }, // Always shiny
-            { name: 'Mewtwo (Armored)', id: 150, shiny: true, rarity: 'ultra_rare', form: 'mewtwo armored', level: 100, special: true }, // Always shiny
-            { name: 'Lugia (Shadow)', id: 249, shiny: true, rarity: 'ultra_rare', form: 'lugia shadow', level: 100, special: true }, // Always shiny
+            { name: 'Armored Shadow Mewtwo', id: 150, shiny: true, rarity: 'ultra_rare', spawnName: 'mewtwo shadows armored', level: 100, special: true },
+            { name: 'Chien-Pao', id: 1002, shiny: false, rarity: 'ultra_rare', spawnName: 'chienpao', level: 100, special: true },
+            { name: 'Terapagos', id: 1024, shiny: false, rarity: 'ultra_rare', spawnName: 'terapagos', level: 100, special: true },
+            { name: 'Cosmoem', id: 790, shiny: false, rarity: 'ultra_rare', spawnName: 'cosmoem', level: 100, special: true },
+            { name: 'Genesect', id: 649, shiny: false, rarity: 'ultra_rare', spawnName: 'genesect', level: 100, special: true },
+            { name: 'Urshifu', id: 892, shiny: false, rarity: 'ultra_rare', spawnName: 'urshifu', level: 100, special: true },
+            
+            // Golden GMAX Pokemon (all shiny with golden shine)
+            { name: 'GMAX Charizard', id: 6, shiny: true, rarity: 'golden', spawnName: 'charizard dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Venusaur', id: 3, shiny: true, rarity: 'golden', spawnName: 'venusaur dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Blastoise', id: 9, shiny: true, rarity: 'golden', spawnName: 'blastoise dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Machamp', id: 68, shiny: true, rarity: 'golden', spawnName: 'machamp dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Gengar', id: 94, shiny: true, rarity: 'golden', spawnName: 'gengar dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Cinderace', id: 815, shiny: true, rarity: 'golden', spawnName: 'cinderace dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Rillaboom', id: 812, shiny: true, rarity: 'golden', spawnName: 'rillaboom dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Corviknight', id: 823, shiny: true, rarity: 'golden', spawnName: 'corviknight dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Toxtricity', id: 849, shiny: true, rarity: 'golden', spawnName: 'toxtricity dynamax_form=gmax', level: 100, special: true, golden: true },
+            { name: 'GMAX Urshifu', id: 892, shiny: true, rarity: 'golden', spawnName: 'urshifu dynamax_form=gmax', level: 100, special: true, golden: true },
             
             // Updated Necrozma forms (now always shiny)
             { name: 'Necrozma (Dawn)', id: 800, shiny: true, rarity: 'ultra_rare', form: 'necrozma prism_fusion=dawn', level: 100, special: true }, // Always shiny
@@ -1281,14 +1331,12 @@
             { name: 'Marshadow', id: 802, shiny: true, rarity: 'ultra_rare', form: 'marshadow shiny', level: 100, special: true }, // Always shiny
             { name: 'Ogerpon (Perfect IV)', id: 1017, shiny: false, rarity: 'ultra_rare', form: 'ogerpon hp_iv=31 attack_iv=31 defence_iv=31 special_attack_iv=31 special_defence_iv=31 speed_iv=31', level: 100, special: true },
             
-            { name: 'Floette (Eternal)', id: 670, shiny: false, rarity: 'ultra_rare', form: 'floette flower=eternal', level: 100, special: true },
             { name: 'Kingambit', id: 983, shiny: false, rarity: 'ultra_rare', form: 'kingambit', level: 100, special: true },
             { name: 'Hoopa (Unbound)', id: 720, shiny: false, rarity: 'ultra_rare', form: 'hoopa', level: 100, special: true, extraItem: 'totem_of_undying' },
             { name: 'White Kyurem', id: 646, shiny: false, rarity: 'ultra_rare', form: 'kyurem absofusion=white', level: 100, special: true },
             { name: 'Black Kyurem', id: 646, shiny: false, rarity: 'ultra_rare', form: 'kyurem absofusion=black', level: 100, special: true },
             { name: 'Arceus', id: 493, shiny: false, rarity: 'ultra_rare', form: 'arceus', level: 100, special: true },
-            { name: 'Red\'s Charizard', id: 6, shiny: false, rarity: 'ultra_rare', form: 'charizard', level: 100, special: true },
-            { name: 'Ursaluna (Bloodmoon)', id: 901, shiny: false, rarity: 'ultra_rare', form: 'ursaluna bloodmoon=true', level: 100, special: true }
+            { name: 'Red\'s Charizard', id: 6, shiny: false, rarity: 'ultra_rare', form: 'charizard', level: 100, special: true }
         ];
 
         let currentWheel = 'normal';
@@ -1303,6 +1351,7 @@
         const MASTERBALL_CHANCE = 0.01; // Same as Nether Star rarity
         const RARE_SHINY_CHANCE = 0.03; // 3% chance for rare shiny starters in hourly
         const SPECIAL_SHINY_CHANCE = 0.05; // 5% chance for shiny in special wheel
+        const TOKEN_PULL_CHANCE = 0.05; // 5% chance for token pulls in hourly
         let rouletteItems = [];
 
         // Function to open IV Roulette popup
@@ -1471,6 +1520,9 @@
                 if (winDetails.isPokemon) {
                     // Pokemon command
                     command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.pokemon.toLowerCase()} lvl=1 shiny`;
+                } else if (winDetails.isToken) {
+                    // Token pull - no in-game command, just notification for manual addition
+                    command = `[TOKEN PULL - MANUAL ADDITION NEEDED]\nPlayer: ${inGameName}\nToken Type: ${winDetails.tokenType}\nAmount: ${winDetails.tokenAmount}`;
                 } else {
                     // Minecraft item command
                     if (winDetails.type === 'masterball' || winDetails.type === 'cherish') {
@@ -1484,15 +1536,17 @@
             } else if (wheelType === 'special') {
                 if (winDetails.isPokemon) {
                     // Special form Pokemon
-                    if (winDetails.specialForm) {
+                    if (winDetails.spawnName) {
+                        command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.spawnName} lvl=${winDetails.level}${winDetails.isShiny ? ' shiny' : ''}`;
+                    } else if (winDetails.specialForm) {
                         command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.specialForm} lvl=${winDetails.level}${winDetails.isShiny ? ' shiny' : ''}`;
-                        
-                        // Add extra command for Hoopa's totem
-                        if (winDetails.pokemon === 'Hoopa (Unbound)') {
-                            command += `\n/give ${inGameName} minecraft:totem_of_undying 1`;
-                        }
                     } else {
                         command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.pokemon.toLowerCase()} lvl=${winDetails.level}${winDetails.isShiny ? ' shiny' : ''}`;
+                    }
+                    
+                    // Add extra command for Hoopa's totem
+                    if (winDetails.pokemon === 'Hoopa (Unbound)') {
+                        command += `\n/give ${inGameName} minecraft:totem_of_undying 1`;
                     }
                 } else {
                     // Minecraft items in special wheel
@@ -1504,11 +1558,12 @@
                 }
             } else {
                 // Normal or Event legendary wheel
+                const spawnName = winDetails.spawnName || winDetails.pokemon.toLowerCase();
                 if (winDetails.pokemon === 'Eternatus') {
                     // Special level for Eternatus
-                    command = `/execute as ${inGameName} at @s run pokespawn eternatus lvl=${winDetails.level}${winDetails.shiny ? ' shiny' : ''}`;
+                    command = `/execute as ${inGameName} at @s run pokespawn ${spawnName} lvl=${winDetails.level}${winDetails.shiny ? ' shiny' : ''}`;
                 } else {
-                    command = `/execute as ${inGameName} at @s run pokespawn ${winDetails.pokemon.toLowerCase()} lvl=${winDetails.level}${winDetails.shiny ? ' shiny' : ''}`;
+                    command = `/execute as ${inGameName} at @s run pokespawn ${spawnName} lvl=${winDetails.level}${winDetails.shiny ? ' shiny' : ''}`;
                 }
             }
             
@@ -1531,6 +1586,9 @@
                 if (wheelType === 'hourly') {
                     if (winDetails.isPokemon) {
                         messageContent += `**Prize:** ✨ Shiny ${winDetails.pokemon} (Lvl 1)\n`;
+                    } else if (winDetails.isToken) {
+                        messageContent += `**Prize:** +${winDetails.tokenAmount} ${winDetails.tokenType.toUpperCase()} Pull${winDetails.tokenAmount > 1 ? 's' : ''}\n`;
+                        messageContent += `**Special:** ⚠️ MANUAL TOKEN ADDITION REQUIRED ⚠️\n`;
                     } else {
                         messageContent += `**Prize:** ${winDetails.item} (${winDetails.count}x)\n`;
                         if (winDetails.type === 'netherstar') {
@@ -1548,19 +1606,25 @@
                         messageContent += `**Pokémon:** ${winDetails.pokemon}${winDetails.isShiny ? ' ✨' : ''}\n`;
                         messageContent += `**Level:** ${winDetails.level}\n`;
                         messageContent += `**Shiny:** ${winDetails.isShiny ? 'Yes' : 'No'}\n`;
+                        messageContent += `**Spawn Name:** ${winDetails.spawnName || winDetails.pokemon.toLowerCase()}\n`;
                         
                         if (winDetails.pokemon === 'Hoopa (Unbound)') {
                             messageContent += `**Extra Prize:** Totem of Undying\n`;
                         }
+                        
+                        if (winDetails.golden) {
+                            messageContent += `**Special:** 🌟 GOLDEN GMAX 🌟\n`;
+                        }
                     } else {
                         messageContent += `**Prize:** ${winDetails.item} (${winDetails.count}x)\n`;
                     }
-                    messageContent += `**Rarity:** ${winDetails.rarity === 'ultra_rare' ? '🌟 ULTRA RARE 🌟' : 'Common'}\n`;
+                    messageContent += `**Rarity:** ${winDetails.rarity === 'ultra_rare' ? '🌟 ULTRA RARE 🌟' : (winDetails.rarity === 'golden' ? '🌟 GOLDEN GMAX 🌟' : 'Common')}\n`;
                 } else {
                     // Legendary wheel win
                     messageContent += `**Pokémon:** ${winDetails.pokemon}${winDetails.shiny ? ' ✨' : ''}\n`;
                     messageContent += `**Level:** ${winDetails.level}\n`;
                     messageContent += `**Shiny:** ${winDetails.shiny ? 'Yes' : 'No'}\n`;
+                    messageContent += `**Spawn Name:** ${winDetails.spawnName || winDetails.pokemon.toLowerCase()}\n`;
                     
                     if (winDetails.pokemon === 'Eternatus') {
                         messageContent += `**Special:** 🌟 ULTIMATE PRIZE! 🌟\n`;
@@ -1578,7 +1642,7 @@
                     embeds: [
                         {
                             title: "🎡 Lucky Wheel Result",
-                            color: winDetails.shiny || winDetails.isShiny || winDetails.isPokemon ? 0xFFD700 : 0x5865F2,
+                            color: winDetails.shiny || winDetails.isShiny || winDetails.isPokemon ? 0xFFD700 : (winDetails.golden ? 0xFFD700 : 0x5865F2),
                             timestamp: new Date().toISOString(),
                             footer: {
                                 text: "Cobblemon Lucky Wheel System"
@@ -1788,13 +1852,15 @@
                     const isEnder = item.type === 'ender';
                     const isMasterball = item.type === 'masterball';
                     const isCherish = item.type === 'cherish';
-                    const isPokemon = item.id <= 1000;
+                    const isPokemon = item.id <= 1000 && !item.isToken;
+                    const isToken = item.isToken;
                     
                     rouletteItems.push({
                         ...item,
                         isShiny: isPokemon, // All hourly Pokemon are shiny
-                        type: isNetherstar ? 'netherstar' : (isEnder ? 'ender' : (isMasterball ? 'masterball' : (isCherish ? 'cherish' : 'normal'))),
-                        isPokemon: isPokemon
+                        type: isNetherstar ? 'netherstar' : (isEnder ? 'ender' : (isMasterball ? 'masterball' : (isCherish ? 'cherish' : (isToken ? 'token' : 'normal')))),
+                        isPokemon: isPokemon,
+                        isToken: isToken
                     });
                     
                     const div = document.createElement('div');
@@ -1808,6 +1874,10 @@
                         div.className = 'roulette-item cherish';
                     } else if (isPokemon) {
                         div.className = 'roulette-item shiny';
+                    } else if (isToken) {
+                        div.className = 'roulette-item';
+                        div.style.background = 'linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%)';
+                        div.style.borderColor = '#4cc9f0';
                     } else {
                         div.className = 'roulette-item';
                     }
@@ -1818,6 +1888,13 @@
                             <div class="roulette-item-name">${item.name}</div>
                             <div class="item-count">Lvl 1</div>
                             <div class="shiny-badge">SHINY</div>
+                        `;
+                    } else if (isToken) { // It's a token pull
+                        div.innerHTML = `
+                            <div style="font-size: 2em; margin-bottom: 10px;">🎟️</div>
+                            <div class="roulette-item-name">${item.name}</div>
+                            <div class="item-count">Token Pull</div>
+                            <div class="shiny-badge" style="background: #4cc9f0; color: white;">TOKEN</div>
                         `;
                     } else { // It's a Minecraft item or Pokéball
                         const spriteUrl = item.sprite || getMinecraftSprite(item.id);
@@ -1836,9 +1913,8 @@
                     let isShiny = false;
                     
                     // Special cases that are always shiny
-                    if (item.name === 'Mewtwo (Shadow)' || item.name === 'Mewtwo (Armored)' || 
-                        item.name === 'Lugia (Shadow)' || item.name === 'Necrozma (Dawn)' || 
-                        item.name === 'Necrozma (Dusk)' || item.name === 'Marshadow') {
+                    if (item.name === 'Armored Shadow Mewtwo' || item.name === 'Necrozma (Dawn)' || 
+                        item.name === 'Necrozma (Dusk)' || item.name === 'Marshadow' || item.golden) {
                         isShiny = true;
                     } else if (item.rarity === 'ultra_rare' && Math.random() < SPECIAL_SHINY_CHANCE) {
                         isShiny = true;
@@ -1847,20 +1923,26 @@
                     const isPokemon = item.id <= 1000 || item.special;
                     const isNetherstar = item.type === 'netherstar';
                     const isMasterball = item.type === 'masterball';
+                    const isGolden = item.golden;
                     
                     rouletteItems.push({
                         ...item,
                         isPokemon: isPokemon,
                         isShiny: isShiny,
                         level: item.level || 100,
-                        rarity: item.rarity || 'common'
+                        rarity: item.rarity || 'common',
+                        golden: isGolden
                     });
                     
                     const div = document.createElement('div');
                     
                     if (isPokemon) {
-                        div.className = 'roulette-item' + (isShiny ? ' shiny' : '');
-                        if (item.rarity === 'ultra_rare') {
+                        if (isGolden) {
+                            div.className = 'roulette-item golden';
+                        } else {
+                            div.className = 'roulette-item' + (isShiny ? ' shiny' : '');
+                        }
+                        if (item.rarity === 'ultra_rare' && !isGolden) {
                             div.style.background = 'linear-gradient(135deg, #9d4edd 0%, #560bad 100%)';
                             div.style.borderColor = '#9d4edd';
                             div.style.boxShadow = '0 0 20px rgba(157, 78, 221, 0.5)';
@@ -1870,7 +1952,8 @@
                             <div class="roulette-item-name">${item.name}</div>
                             <div class="item-count">Lvl ${item.level || 100}</div>
                             ${isShiny ? '<div class="shiny-badge">SHINY</div>' : ''}
-                            ${item.rarity === 'ultra_rare' ? '<div class="shiny-badge" style="background: #9d4edd; color: white;">ULTRA RARE</div>' : ''}
+                            ${isGolden ? '<div class="shiny-badge" style="background: #ffd700; color: black;">GOLDEN GMAX</div>' : ''}
+                            ${item.rarity === 'ultra_rare' && !isGolden ? '<div class="shiny-badge" style="background: #9d4edd; color: white;">ULTRA RARE</div>' : ''}
                         `;
                     } else {
                         if (isNetherstar) {
@@ -1915,7 +1998,8 @@
                         pokemon: item,
                         isShiny: isShiny,
                         level: level,
-                        rarity: item.rarity || 'legendary'
+                        rarity: item.rarity || 'legendary',
+                        spawnName: item.spawnName
                     });
                     
                     const div = document.createElement('div');
@@ -1954,12 +2038,23 @@
                     } else if (item.type === 'cherish') {
                         listItem.style.background = 'linear-gradient(135deg, rgba(255,107,107,0.2) 0%, rgba(238,90,36,0.2) 100%)';
                         listItem.style.borderColor = '#ff6b6b';
+                    } else if (item.isToken) {
+                        listItem.style.background = 'linear-gradient(135deg, rgba(76, 201, 240, 0.3) 0%, rgba(67, 97, 238, 0.3) 100%)';
+                        listItem.style.borderColor = '#4cc9f0';
                     }
-                    const spriteUrl = item.sprite || getMinecraftSprite(item.id);
-                    listItem.innerHTML = `
-                        <img class="pokemon-sprite" src="${spriteUrl}" alt="${item.name}">
-                        <span>${item.name} (${item.count}x)</span>
-                    `;
+                    
+                    if (item.isToken) {
+                        listItem.innerHTML = `
+                            <div style="font-size: 1.5em;">🎟️</div>
+                            <span>${item.name}</span>
+                        `;
+                    } else {
+                        const spriteUrl = item.sprite || getMinecraftSprite(item.id);
+                        listItem.innerHTML = `
+                            <img class="pokemon-sprite" src="${spriteUrl}" alt="${item.name}">
+                            <span>${item.name} (${item.count}x)</span>
+                        `;
+                    }
                     list.appendChild(listItem);
                 });
                 
@@ -1984,7 +2079,10 @@
                     const listItem = document.createElement('div');
                     listItem.className = 'pokemon-item';
                     
-                    if (item.rarity === 'ultra_rare') {
+                    if (item.golden) {
+                        listItem.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 183, 3, 0.3) 100%)';
+                        listItem.style.borderColor = '#ffd700';
+                    } else if (item.rarity === 'ultra_rare') {
                         listItem.style.background = 'linear-gradient(135deg, rgba(157, 78, 221, 0.3) 0%, rgba(86, 11, 173, 0.3) 100%)';
                         listItem.style.borderColor = '#9d4edd';
                     } else {
@@ -1994,12 +2092,11 @@
                     
                     if (item.id <= 1000 || item.special) {
                         // It's a Pokemon
-                        const isAlwaysShiny = item.name === 'Mewtwo (Shadow)' || item.name === 'Mewtwo (Armored)' || 
-                                             item.name === 'Lugia (Shadow)' || item.name === 'Necrozma (Dawn)' || 
-                                             item.name === 'Necrozma (Dusk)' || item.name === 'Marshadow';
+                        const isAlwaysShiny = item.name === 'Armored Shadow Mewtwo' || item.name === 'Necrozma (Dawn)' || 
+                                             item.name === 'Necrozma (Dusk)' || item.name === 'Marshadow' || item.golden;
                         listItem.innerHTML = `
                             <img class="pokemon-sprite" src="${getSprite(item.id, isAlwaysShiny)}" alt="${item.name}">
-                            <span>${item.name} (Lvl ${item.level || 100})${isAlwaysShiny ? ' ✨' : ''}${item.rarity === 'ultra_rare' ? ' 🌟' : ''}</span>
+                            <span>${item.name} (Lvl ${item.level || 100})${isAlwaysShiny ? ' ✨' : ''}${item.golden ? ' 🌟' : (item.rarity === 'ultra_rare' ? ' 🌟' : '')}</span>
                         `;
                     } else {
                         // It's an item
@@ -2235,7 +2332,7 @@
                     const hourlyWins = JSON.parse(localStorage.getItem('hourly_wins_history') || '{}');
                     if (!hourlyWins[selectedPlayer]) hourlyWins[selectedPlayer] = [];
                     
-                    // Check if it's a Pokemon or Minecraft item
+                    // Check if it's a Pokemon, Minecraft item, or Token
                     let winDetails;
                     if (winningItemData.isPokemon) { // Pokemon
                         winDetails = {
@@ -2247,6 +2344,17 @@
                             timestamp: new Date().toISOString()
                         };
                         hourlyWins[selectedPlayer].push(winDetails);
+                    } else if (winningItemData.isToken) { // Token pull
+                        winDetails = {
+                            item: winningItemData.name,
+                            id: winningItemData.id,
+                            isPokemon: false,
+                            isToken: true,
+                            tokenType: winningItemData.tokenType,
+                            tokenAmount: winningItemData.tokenAmount,
+                            timestamp: new Date().toISOString()
+                        };
+                        hourlyWins[selectedPlayer].push(winDetails);
                     } else { // Minecraft item
                         winDetails = {
                             item: winningItemData.name,
@@ -2254,6 +2362,7 @@
                             count: winningItemData.count,
                             type: winningItemData.type,
                             isPokemon: false,
+                            isToken: false,
                             timestamp: new Date().toISOString()
                         };
                         hourlyWins[selectedPlayer].push(winDetails);
@@ -2279,8 +2388,10 @@
                             isPokemon: true,
                             isShiny: winningItemData.isShiny,
                             level: winningItemData.level,
+                            spawnName: winningItemData.spawnName,
                             specialForm: winningItemData.form,
                             rarity: winningItemData.rarity,
+                            golden: winningItemData.golden,
                             timestamp: new Date().toISOString()
                         };
                     } else { // Item
@@ -2315,6 +2426,7 @@
                         level: winningItemData.level,
                         type: currentWheel,
                         rarity: winningItemData.rarity,
+                        spawnName: winningItemData.spawnName,
                         timestamp: new Date().toISOString()
                     };
                     
@@ -2351,8 +2463,9 @@
             const enderBadge = document.getElementById('enderBadge');
             const masterballBadge = document.getElementById('masterballBadge');
             const cherishBadge = document.getElementById('cherishBadge');
+            const goldenBadge = document.getElementById('goldenBadge');
             
-            popup.classList.remove('shiny', 'netherstar', 'ender', 'masterball', 'cherish');
+            popup.classList.remove('shiny', 'netherstar', 'ender', 'masterball', 'cherish', 'golden');
             popup.style.background = '';
             popup.style.borderColor = '';
             shinyBadge.style.display = 'none';
@@ -2360,9 +2473,10 @@
             enderBadge.style.display = 'none';
             masterballBadge.style.display = 'none';
             cherishBadge.style.display = 'none';
+            goldenBadge.style.display = 'none';
             
             if (currentWheel === 'hourly') {
-                // Check if it's a Pokemon or Minecraft item
+                // Check if it's a Pokemon, Minecraft item, or Token
                 if (item.isPokemon) { // Pokemon
                     sprite.src = getSprite(item.id, true);
                     name.textContent = item.name;
@@ -2370,6 +2484,16 @@
                     popup.classList.add('shiny');
                     title.textContent = '🌟 SHINY POKÉMON! 🌟';
                     shinyBadge.style.display = 'block';
+                } else if (item.isToken) { // Token pull
+                    sprite.src = 'https://cdn-icons-png.flaticon.com/512/217/217853.png'; // Token icon
+                    name.textContent = `${item.name}`;
+                    levelDisplay.textContent = `Manual Token Addition Required`;
+                    title.textContent = '🎟️ TOKEN PULL! 🎟️';
+                    popup.style.background = 'linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%)';
+                    popup.style.borderColor = '#4cc9f0';
+                    name.style.color = 'white';
+                    levelDisplay.style.color = 'white';
+                    title.style.color = 'white';
                 } else { // Minecraft item
                     sprite.src = item.sprite || getMinecraftSprite(item.id);
                     
@@ -2409,7 +2533,11 @@
                     name.textContent = item.name;
                     levelDisplay.textContent = `Level: ${item.level || 100}`;
                     
-                    if (isShiny) {
+                    if (item.golden) {
+                        popup.classList.add('golden');
+                        title.textContent = '🌟 GOLDEN GMAX POKÉMON! 🌟';
+                        goldenBadge.style.display = 'block';
+                    } else if (isShiny) {
                         popup.classList.add('shiny');
                         title.textContent = '🌟 SHINY SPECIAL POKÉMON! 🌟';
                         shinyBadge.style.display = 'block';
